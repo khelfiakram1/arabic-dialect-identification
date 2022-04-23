@@ -63,7 +63,7 @@ def label2num(label,original_label):
 def split_data(name,filelist,utt_label,spk_label=[],lang_label=[],total_split=1):
     split_len = len(utt_label)/total_split
     overflow = len(utt_label)%total_split
-    print split_len, overflow
+    print (split_len, overflow)
 #     os.mkdir(name+'/split'+str(total_split))
     subprocess.call(['mkdir','-p', name+'/split'+str(total_split)])
     start=0
@@ -100,7 +100,7 @@ def split_data(name,filelist,utt_label,spk_label=[],lang_label=[],total_split=1)
 def split_segments(name,segments,total_split):
     split_len = len(segments)/total_split
     overflow = len(segments)%total_split
-    print split_len,overflow
+    print (split_len,overflow)
     start=0
     end_=0
 

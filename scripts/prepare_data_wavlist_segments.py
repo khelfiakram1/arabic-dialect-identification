@@ -37,7 +37,7 @@ def write_tfrecords(feat, utt_label, utt_shape, tfrecords_name):
         writer.write(serialized)
 
     writer.close()
-    print tfrecords_name+": total "+str(len(feat))+" feature and "+str(np.shape(utt_label))+" label saved"
+    print (tfrecords_name+": total "+str(len(feat))+" feature and "+str(np.shape(utt_label))+" label saved")
     
 
 

@@ -11,8 +11,8 @@ args = parser.parse_known_args()[0]
 
 LABEL_FILENAME = args.label
 SCORE_FILENAME = args.score
-print "\n\nLabel = %s"% (LABEL_FILENAME)
-print "Score = %s"% (SCORE_FILENAME)
+print ("\n\nLabel = %s"% (LABEL_FILENAME))
+print ("Score = %s"% (SCORE_FILENAME))
 
 
 def measure_cavg(llr_scores,labels):
@@ -42,7 +42,7 @@ def measure_cavg(llr_scores,labels):
     P_fa_mat = np.array(P_fa_mat)
 
     C_avg = np.mean(np.sum(C_mat,0)/16.0)
-    print "C_avg*100 = %.2f" % (C_avg*100.0)
+    print ("C_avg*100 = %.2f" % (C_avg*100.0))
 
 
 lines = open(SCORE_FILENAME).readlines()
@@ -60,7 +60,7 @@ lang2num={}
 for line in lines:
     row = line.rstrip().split()
     lang2num[row[0]]=row[1]
-print lang2num
+print (lang2num)
 
 lines = open(LABEL_FILENAME).readlines()
 lines.sort()
@@ -99,18 +99,18 @@ for L_p in range(np.shape(scores)[1]):
 
 llr_scores = np.array(llr_scores)
 
-print "\nPerformance evaluation (Overall)"
+print ("\nPerformance evaluation (Overall)")
 measure_cavg(llr_scores,labels)
 
 
 if args.duration:    
     duration1=5
     duration2=20
-    print "\nPerformance evaluation (duration>=%d)"%duration1
+    print ("\nPerformance evaluation (duration>=%d)"%duration1)
     measure_cavg(llr_scores[dur<duration1,:],labels[dur<duration1])
-    print "\nPerformance evaluation (%d<=duration<%d)"%(duration1,duration2)
+    print ("\nPerformance evaluation (%d<=duration<%d)"%(duration1,duration2))
     measure_cavg(llr_scores[(dur<duration2) & (dur>=duration1),:],labels[(dur<duration2) & (dur>=duration1)])
-    print "\nPerformance evaluation (duration>=%d)"%duration2
+    print ("\nPerformance evaluation (duration>=%d)"%duration2)
     measure_cavg(llr_scores[dur>=duration2,:],labels[dur>=duration2])
 
 

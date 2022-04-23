@@ -103,7 +103,7 @@ TFRECORDS_FOLDER = './data/tfrecords/'
 SAVER_FOLDERNAME = 'saver'
 
 if len(sys.argv)< 13:
-    print "not enough arguments"
+    print ("not enough arguments")
     
 resume = False
 is_batchnorm = False

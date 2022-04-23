@@ -14,7 +14,7 @@ def accuracy_detail(predictions, labels,languages):
     hypo_lang = np.argmax(predictions,axis = 1)
     temp = ((labels) - hypo_lang)
     acc =1- np.size(np.nonzero(temp)) / float(np.size(labels))
-    print 'Final accurary on test dataset : %0.2f' %(acc*100)
+    print ('Final accurary on test dataset : %0.2f' %(acc*100))
 
     for i,lang in enumerate(languages):
         hypo_bylang = hypo_lang[ labels == i]
@@ -48,8 +48,8 @@ args = parser.parse_known_args()[0]
 
 LABEL_FILENAME = args.label
 SCORE_FILENAME = args.score
-print "\n\nLabel = %s"% (LABEL_FILENAME)
-print "Score = %s"% (SCORE_FILENAME)
+print ("\n\nLabel = %s"% (LABEL_FILENAME))
+print ("Score = %s"% (SCORE_FILENAME))
 
 # load language dictionary file to map language str to index (ex: 'EGY'->2)
 lines = open('data/language_id_initial').readlines()
@@ -58,7 +58,7 @@ for line in lines:
     cols = line.rstrip().split()
     lang2idx[cols[0]] = int(cols[1])
     
-print "language set = ",lang2idx
+print ("language set = ",lang2idx)
 
 # load dev set label in segment level
 lines = open(LABEL_FILENAME).readlines()
@@ -83,8 +83,8 @@ scores = np.array(scores)
 # calculate accuracy
 label_mat = np.eye(len(lang2idx.keys()))[true_label] 
 acc,rec,pre = accuracy_detail(scores, true_label,lang2idx.keys())
-print "\nPerformance evaluation (Overall)"
-print "Accuracy = %0.2f%%, Recall = %0.2f%%, Precision = %0.2f%%"% (acc,rec,pre)
+print ("\nPerformance evaluation (Overall)")
+print ("Accuracy = %0.2f%%, Recall = %0.2f%%, Precision = %0.2f%%"% (acc,rec,pre))
 
 
 
@@ -106,20 +106,20 @@ dur = np.array(dur)
 
 if args.duration:
     duration = 5
-    print "\nPerformance evaluation (duration<%d)"%duration
+    print ("\nPerformance evaluation (duration<%d)"%duration)
     # calculate accuracy
     acc,rec,pre = accuracy_detail(scores[dur<duration,:], true_label[dur<duration],lang2idx.keys())
-    print "Accuracy = %0.2f%%, Recall = %0.2f%%, Precision = %0.2f%%"% (acc,rec,pre)
+    print ("Accuracy = %0.2f%%, Recall = %0.2f%%, Precision = %0.2f%%"% (acc,rec,pre))
 
     duration1 = 5
     duration2 = 20
-    print "\nPerformance evaluation (%d<=duration<%d)"%(duration1,duration2)
+    print ("\nPerformance evaluation (%d<=duration<%d)"%(duration1,duration2))
     # calculate accuracy
     acc,rec,pre = accuracy_detail(scores[(dur<duration2) & (dur>=duration1),:], true_label[(dur<duration2) & (dur>=duration1)],lang2idx.keys())
-    print "Accuracy = %0.2f%%, Recall = %0.2f%%, Precision = %0.2f%%"% (acc,rec,pre)
+    print ("Accuracy = %0.2f%%, Recall = %0.2f%%, Precision = %0.2f%%"% (acc,rec,pre))
 
     duration = 20
-    print "\nPerformance evaluation (duration>=%d)"%duration
+    print ("\nPerformance evaluation (duration>=%d)"%duration)
     # calculate accuracy
     acc,rec,pre = accuracy_detail(scores[dur>=duration,:], true_label[dur>=duration],lang2idx.keys())
-    print "Accuracy = %0.2f%%, Recall = %0.2f%%, Precision = %0.2f%%"% (acc,rec,pre)
+    print ("Accuracy = %0.2f%%, Recall = %0.2f%%, Precision = %0.2f%%"% (acc,rec,pre))
