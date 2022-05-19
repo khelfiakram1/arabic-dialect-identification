@@ -10,11 +10,13 @@ def cmvn_slide(feat,winlen=300,cmvn=False): #feat : (length, dim) 2d matrix
     new_feat = np.empty_like(feat)
     cur = 1
     leftwin = 0
-    rightwin = winlen/2
+    rightwin = int(winlen/2)
     
     # middle
     for cur in range(maxlen):
-        cur_slide = feat[cur-leftwin:cur+rightwin,:] 
+
+        cur_slide = feat[cur-leftwin:cur+rightwin,:]
+
         #cur_slide = feat[cur-winlen/2:cur+winlen/2,:]
         mean =np.mean(cur_slide,axis=0)
         std = np.std(cur_slide,axis=0)

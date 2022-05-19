@@ -16,7 +16,7 @@ N_FFT=400
 HOP=160
 VAD=True
 CMVN='m'
-DATA_ROOT='/your_own_folder'
+DATA_ROOT='/Users/mac/Desktop/Master_topic/arabic_dialect_identification_v2/wav'
 
 #prepare wav.scp for each data set. Set your $DATA_ROOT variable before run. 
 lines = open('data/dev/utt2lang').readlines()
@@ -66,16 +66,16 @@ feat, _, utt_shape, tffilename = ft.feat_extract(wav_list,FEAT_TYPE,N_FFT,HOP,VA
 
 
 #init placeholder
-test_feat_batch = tf.placeholder(tf.float32, [None,None,np.int(INPUT_DIM)],name="test_feat_batch")
-test_label_batch = tf.placeholder(tf.int32, [None],name="test_label_batch")
-test_shape_batch = tf.placeholder(tf.int32, [None,2],name="test_shape_batch")
+test_feat_batch = tf.compat.v1.placeholder(tf.float32, [None,None,np.int(INPUT_DIM)],name="test_feat_batch")
+test_label_batch = tf.compat.v1.placeholder(tf.int32, [None],name="test_label_batch")
+test_shape_batch = tf.compat.v1.placeholder(tf.int32, [None,2],name="test_shape_batch")
 
 #init model
 emnet_validation = nn_model.nn(test_feat_batch,test_label_batch,test_label_batch,test_shape_batch, SOFTMAX_NUM,False,INPUT_DIM,is_batchnorm);
-tf.get_variable_scope().reuse_variables()
-sess = tf.InteractiveSession()
-saver = tf.train.Saver()
-tf.initialize_all_variables().run()
+tf.compat.v1.get_variable_scope().reuse_variables()
+sess = tf.compat.v1.InteractiveSession()
+saver = tf.compat.v1.train.Saver()
+tf.compat.v1.initialize_all_variables().run()
 
 #load pretrained model
 RESUME_STARTPOINT = 7712000

@@ -6,7 +6,7 @@ import feature_tools as ft
 
 
 def write_tfrecords(feat, utt_label, utt_shape, tfrecords_name):
-    writer = tf.python_io.TFRecordWriter(tfrecords_name)
+    writer = tf.io.TFRecordWriter(tfrecords_name)
     trIdx = range(np.shape(utt_label)[0])
     
     # iterate over each example

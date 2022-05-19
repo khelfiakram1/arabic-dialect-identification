@@ -98,26 +98,26 @@ def split_data(name,filelist,utt_label,spk_label=[],lang_label=[],total_split=1)
                     
                     
 def split_segments(name,segments,total_split):
-    split_len = len(segments)/total_split
-    overflow = len(segments)%total_split
-    print (split_len,overflow)
+    split_len = len(segments)//total_split
+    # overflow = len(segments)%total_split
+    # print (split_len, overflow)
     start=0
     end_=0
 
-    for split in range(1,total_split+1):
+    for split in range(1, total_split+1):
         subprocess.call(['mkdir','-p', name+'/split'+str(total_split)+'/'+str(split)])
         filename_segments = name+'/split'+str(total_split)+'/'+str(split)+'/segments'
         start = end_
         end_ = start+split_len
-        if overflow>0:
-            overflow-=1
-            end_+=1
+        # if overflow>0:
+            # overflow-=1
+            # end_+=1
         if split==total_split:
             end_ = len(segments)
 
         with open(filename_segments,'w') as file:
             for iter in range(start,end_):
-                file.write('%s\n' % (segments[iter].rstrip()) )
+                file.write('%s\n' % (segments[iter].rstrip()))
             
 
     
@@ -174,4 +174,3 @@ def write_data(name,utt_label,filelist,spk_label,lang_label=-1):
 #     return filelist,list,label,label_num
 
 
-    

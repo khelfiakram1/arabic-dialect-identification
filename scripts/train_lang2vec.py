@@ -22,15 +22,15 @@ def txtwrite(filename, dict):
             text_file.write(' ]\n')
 
 def variable_summaries(var):
-    with tf.name_scope('summaries'):
-        mean = tf.reduce_mean(var)
-        tf.summary.scalar('mean', mean)
-        with tf.name_scope('stddev'):
-            stddev = tf.sqrt(tf.reduce_mean(tf.square(var - mean)))
-        tf.summary.scalar('stddev', stddev)
-        tf.summary.scalar('max', tf.reduce_max(var))
-        tf.summary.scalar('min', tf.reduce_min(var))
-        tf.summary.histogram('histogram', var)
+    with tf.compat.v1.name_scope('summaries'):
+        mean = tf.reduce_mean(input_tensor=var)
+        tf.compat.v1.summary.scalar('mean', mean)
+        with tf.compat.v1.name_scope('stddev'):
+            stddev = tf.sqrt(tf.reduce_mean(input_tensor=tf.square(var - mean)))
+        tf.compat.v1.summary.scalar('stddev', stddev)
+        tf.compat.v1.summary.scalar('max', tf.reduce_max(input_tensor=var))
+        tf.compat.v1.summary.scalar('min', tf.reduce_min(input_tensor=var))
+        tf.compat.v1.summary.histogram('histogram', var)
             
         
 #### function for read tfrecords
@@ -38,22 +38,22 @@ def read_and_decode_emnet_mfcc(filename):
     # first construct a queue containing a list of filenames.
     # this lets a user split up there dataset in multiple files to keep
     # size down
-    filename_queue = tf.train.string_input_producer(filename, name = 'queue')
+    filename_queue = tf.compat.v1.train.string_input_producer(filename, name = 'queue')
     # Unlike the TFRecordWriter, the TFRecordReader is symbolic
-    reader = tf.TFRecordReader()
+    reader = tf.compat.v1.TFRecordReader()
     # One can read a single serialized example from a filename
     # serialized_example is a Tensor of type string.
     _, serialized_example = reader.read(filename_queue)
     # The serialized example is converted back to actual values.
     # One needs to describe the format of the objects to be returned
-    features = tf.parse_single_example(
-        serialized_example,
+    features = tf.io.parse_single_example(
+        serialized=serialized_example,
         features={
             # We know the length of both fields. If not the
             # tf.VarLenFeature could be used
-            'labels': tf.FixedLenFeature([], tf.int64),
-            'shapes': tf.FixedLenFeature([2], tf.int64),
-            'features': tf.VarLenFeature( tf.float32)
+            'labels': tf.io.FixedLenFeature([], tf.int64),
+            'shapes': tf.io.FixedLenFeature([2], tf.int64),
+            'features': tf.io.VarLenFeature( tf.float32)
         })
     # now return the converted data
     labels = features['labels']
@@ -81,7 +81,7 @@ def average_gradients(tower_grads):
 
         # Average over the 'tower' dimension.
         grad = tf.concat(axis=0, values=grads)
-        grad = tf.reduce_mean(grad, 0)
+        grad = tf.reduce_mean(input_tensor=grad, axis=0)
 
         v = grad_and_vars[0][1]
         grad_and_var = (grad, v)
@@ -136,7 +136,7 @@ for i in range(1,TOTAL_SPLIT+1):
 
 
 labels,shapes,feats = read_and_decode_emnet_mfcc(records_shuffle_list)
-labels_batch,feats_batch,shapes_batch = tf.train.batch(
+labels_batch,feats_batch,shapes_batch = tf.compat.v1.train.batch(
     [labels, feats,shapes], batch_size=BATCHSIZE, dynamic_pad=True, allow_smaller_final_batch=True,
     capacity=50)
 FEAT_TYPE = FEAT_TYPE.split('_exshort')[0]
@@ -160,45 +160,45 @@ with tf.device('/cpu:0'):
 
     softmax_num = SOFTMAX_NUM
     global_step = tf.Variable(0, trainable=False)
-    learning_rate = tf.train.exponential_decay(LEARNING_RATE, global_step,
+    learning_rate = tf.compat.v1.train.exponential_decay(LEARNING_RATE, global_step,
                                                50000, 0.98, staircase=True)
 
-    opt = tf.train.GradientDescentOptimizer(learning_rate)
+    opt = tf.compat.v1.train.GradientDescentOptimizer(learning_rate)
 
     emnet_losses = []
     emnet_grads = []
     
-    feat_batch = tf.placeholder(tf.float32, [None,None,np.int(INPUT_DIM)],name="feat_batch")
-    label_batch = tf.placeholder(tf.int32, [None],name="label_batch")
-    shape_batch = tf.placeholder(tf.int32, [None,2],name="shape_batch")
+    feat_batch = tf.compat.v1.placeholder(tf.float32, [None,None,np.int(INPUT_DIM)],name="feat_batch")
+    label_batch = tf.compat.v1.placeholder(tf.int32, [None],name="label_batch")
+    shape_batch = tf.compat.v1.placeholder(tf.int32, [None,2],name="shape_batch")
     
-    test_feat_batch = tf.placeholder(tf.float32, [None,None,np.int(INPUT_DIM)],name="test_feat_batch")
-    test_label_batch = tf.placeholder(tf.int32, [None],name="test_label_batch")
-    test_shape_batch = tf.placeholder(tf.int32, [None,2],name="test_shape_batch")
+    test_feat_batch = tf.compat.v1.placeholder(tf.float32, [None,None,np.int(INPUT_DIM)],name="test_feat_batch")
+    test_label_batch = tf.compat.v1.placeholder(tf.int32, [None],name="test_label_batch")
+    test_shape_batch = tf.compat.v1.placeholder(tf.int32, [None,2],name="test_shape_batch")
     
 
-    with tf.variable_scope(tf.get_variable_scope()):
+    with tf.compat.v1.variable_scope(tf.compat.v1.get_variable_scope()):
         for i in range(NUMGPUS):
             with tf.device('/gpu:%d' % i):
                 emnet = nn_model.nn(feat_batch,label_batch,label_batch,shape_batch, softmax_num,True,INPUT_DIM,is_batchnorm)
-                tf.get_variable_scope().reuse_variables()
+                tf.compat.v1.get_variable_scope().reuse_variables()
                 grads = opt.compute_gradients(emnet.loss)
                 emnet_losses.append(emnet.loss)
                 emnet_grads.append(grads)
         
         with tf.device('/gpu:0'):
             emnet_validation = nn_model.nn(test_feat_batch,test_label_batch,test_label_batch,test_shape_batch, softmax_num,False,INPUT_DIM,is_batchnorm);
-            tf.get_variable_scope().reuse_variables()
+            tf.compat.v1.get_variable_scope().reuse_variables()
     
-    loss = tf.reduce_mean(emnet_losses)        
+    loss = tf.reduce_mean(input_tensor=emnet_losses)        
     grads = average_gradients(emnet_grads)
     apply_gradient_op = opt.apply_gradients(grads, global_step=global_step)
     
-    sess = tf.InteractiveSession()
-    saver = tf.train.Saver(max_to_keep=MAX_SAVEFILE_LIMIT)
+    sess = tf.compat.v1.InteractiveSession()
+    saver = tf.compat.v1.train.Saver(max_to_keep=MAX_SAVEFILE_LIMIT)
     
-    tf.initialize_all_variables().run()
-    tf.train.start_queue_runners(sess=sess)
+    tf.compat.v1.initialize_all_variables().run()
+    tf.compat.v1.train.start_queue_runners(sess=sess)
     
     #load entire test set
     test_list = np.loadtxt('data/'+TEST_SET_NAME+'/wav.scp',dtype='string',usecols=[1])
